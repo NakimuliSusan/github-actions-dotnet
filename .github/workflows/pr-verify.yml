@@ -23,3 +23,6 @@ jobs:
 
       - name: Run Tests
         run: dotnet test --configuration Release --no-build
+
+      - name: Run formatter
+        run: dotnet format -v detailed --verify-no-changes
