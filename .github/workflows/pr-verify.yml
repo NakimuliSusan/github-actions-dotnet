@@ -33,7 +33,7 @@ jobs:
   
       
       - name: Run formatter
-        run: dotnet format -v detailed --verify-no-changes
+        run: dotnet format
 
       - name: Commit formatting changes and push
         uses: stefanzweifel/git-auto-commit-action@v5
