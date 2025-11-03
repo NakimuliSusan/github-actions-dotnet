@@ -33,7 +33,7 @@ jobs:
   
       
       - name: Run formatter
-        run: dotnet format --configuration Release
+        run: dotnet format -v detailed --verify-no-changes
 
       - name: Commit formatting changes and push
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -42,6 +42,3 @@ jobs:
 
           commit_author: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
 
-      # NOTE: No separate 'Run formatter' check is needed now.
-      # If the tests pass and the auto-commit succeeds (or has nothing to commit), 
-      # the PR is considered verified and ready to merge (assuming branch protection is set).
