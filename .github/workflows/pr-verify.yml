@@ -35,7 +35,7 @@ jobs:
       - name: Run formatter
         run: dotnet format
 
-      - name: Commit formatting changes and push
+      - name: Commit formatted changes and push
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: Apply automatic dotnet format changes"
