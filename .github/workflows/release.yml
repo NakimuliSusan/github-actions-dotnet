@@ -1,0 +1,55 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Runs when a tag starting with 'v' is pushed, e.g., v1.0.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history with tags
+
+      - name: Get previous tag
+        id: previoustag
+        run: |
+          prev_tag=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}"^ 2>/dev/null || true)
+          echo "previous_tag=$prev_tag" >> $GITHUB_OUTPUT
+
+      - name: Generate Changelog (only between tags)
+        id: changelog
+        shell: bash
+        run: |
+          prev="${{ steps.previoustag.outputs.previous_tag }}"
+          tag="${GITHUB_REF_NAME}"
+
+          # Generate changelog safely
+          if [ -n "$prev" ]; then
+            changelog=$(git log "${prev}..${tag}" --pretty=format:"- %s (%h)" || true)
+          else
+            changelog=$(git log "${tag}" --pretty=format:"- %s (%h)" || true)
+          fi
+
+          {
+            echo "changelog<<CHANGELOG"
+            echo "## What is in this release ${tag}"
+            echo ""
+            echo "$changelog"
+            echo "CHANGELOG"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
